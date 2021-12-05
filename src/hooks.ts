@@ -64,7 +64,7 @@ export async function casHandler(
 			status: 302,
 			headers: {
 				location: data.redirect,
-				"set-cookie": cookieName + "=" + (data.session ?? "")
+				"set-cookie": cookieName + "=" + (data.session ?? "") + ";Secure;HttpOnly"
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 	"description": "CAS/SSO integration in SvelteKit",
 	"module": "dist/index.mjs",
 	"main": "dist/index.js",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",

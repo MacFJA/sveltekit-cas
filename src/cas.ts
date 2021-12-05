@@ -1,12 +1,14 @@
 import env from "env-var"
 import { CASClientV2 } from "logical-cas-client"
-import { Jwt, create, verify } from "njwt"
+import njwt from "njwt"
+const create = njwt.create,
+	verify = njwt.verify
 
 /**
  * @internal
  * @param {string} username
  */
-const createJwt = (username: string): Jwt =>
+const createJwt = (username: string) =>
 	create(
 		{
 			iss: env.get("JWT_ISS").default("sveltekit-cas").asString(),

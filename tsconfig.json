@@ -2,10 +2,14 @@
 	"compilerOptions": {
 		"moduleResolution": "node",
 		"esModuleInterop": true,
-		"emitDeclarationOnly": true,
-		"declaration": true,
-		"declarationDir": "types/",
-		"stripInternal": true
+		"stripInternal": true,
+		"target": "ES2016",
+		"strict": true
 	},
-	"files": ["src/index.ts"]
+	"typedocOptions": {
+		"entryPoints": ["src/index.ts"],
+		"out": "docs"
+	},
+	"files": ["src/index.ts"],
+	"exclude": ["tests", "node_modules"]
 }

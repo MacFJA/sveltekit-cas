@@ -2,6 +2,14 @@
 
 A set of functions to ease usage of a CAS/SSO in SvelteKit
 
+![Github CI](https://github.com/macfja/sveltekit-cas/workflows/Quality%20checks/badge.svg)
+![GitHub Repo stars](https://img.shields.io/github/stars/macfja/sveltekit-cas?style=social)
+![NPM bundle size](https://img.shields.io/bundlephobia/minzip/@macfja/sveltekit-cas)
+![Download per week](https://img.shields.io/npm/dw/@macfja/sveltekit-cas)
+![License](https://img.shields.io/npm/l/@macfja/sveltekit-cas)
+![NPM version](https://img.shields.io/npm/v/@macfja/sveltekit-cas)
+![Snyk Vulnerabilities for npm package](https://img.shields.io/snyk/vulnerabilities/npm/@macfja/sveltekit-cas)
+
 ## Installation
 
 ```shell
@@ -10,56 +18,48 @@ npm install --save @macfja/sveltekit-cas
 
 ## Usage
 
-Protect all pages that start with `/profile/` and only allow user to go on his own page (`/profile/my-cool-username`) and fill the session with the token (or `null`) to provide to endpoints and the username of the connected user (or `null`)
+Protect all pages that start with `/profile/` and only allow user to go on his own page (`/profile/my-cool-username`)
 
-```javascript
-// src/hooks.js
-import { casHandler, getSessionToken, getSessionUser } from "@macfja/sveltekit-cas"
+```typescript
+// src/hooks.server.ts
+import { sessionHook } from "@macfja/sveltekit-session"
+import { casHandler } from "@macfja/sveltekit-cas"
+import type { Handle } from "@sveltejs/kit"
+import { sequence } from "@sveltejs/kit/hooks"
 
-export async function handle({ request, resolve }) {
-	return (
-		(await casHandler(
-			(request) => request.path.startsWith("/profile/"),
-			(request, user) => {
-				const regexp = request.path.match(/\/profile\/(\w+)/)
-				return user !== regexp[1]
-			},
-			request
-		)) || resolve(request)
+export const handle: Handle = sequence(
+	sessionHook(),
+	casHandler(
+		"http://0.0.0.0:8080",
+		2,
+		(event) => event.url.pathname.startsWith("/profile/"),
+		(event, user) => {
+			const regexp = event.url.pathname.match(/\/profile\/(\w+)/)
+			return user !== regexp[1]
+		}
 	)
-}
-
-export function getSession(request) {
-	return {
-		...getSessionToken(request),
-		...getSessionUser(request)
-	}
-}
+)
 ```
 
 Protect endpoint, so only connected user can access it
 
-```javascript
-// src/routes/api/user.js
-import { validate, validateUser } from "@macfja/sveltekit-cas"
+```typescript
+// src/routes/api/user/server.ts
+import { error } from "@sveltejs/kit"
+import { getUsername } from "@macfja/sveltekit-cas"
+import type { RequestHandler } from "./$types"
 
-export async function post({ headers }: ServerRequest): Promise<EndpointOutput> {
-	const token = headers.token ?? null
-	const access = validateUser(token, "admin")
-
-	if (access !== null) {
-		return access
+export const POST: RequestHandler = async (event) => {
+	if (getUsername(event) !== "admin") {
+		throw error(403)
 	}
 
 	// ... Do operation that only the user `admin` can do
 }
 
-export async function get({ headers }: ServerRequest): Promise<EndpointOutput> {
-	const token = headers.token ?? null
-	const access = validate(token)
-
-	if (access !== null) {
-		return access
+export const GET: RequestHandler = async (event) => {
+	if (getUsername(event) === undefined) {
+		throw error(401)
 	}
 
 	// ... Do operation that only connected user can do
@@ -68,18 +68,12 @@ export async function get({ headers }: ServerRequest): Promise<EndpointOutput> {
 
 ## Configuration
 
-The package have several configuration.  
-They are all have to be set as environment variables
+The `casHandler` function take 4 parameters to change its behavior:
 
-| Name                 | Default                         | Comment                                                  |
-| -------------------- | ------------------------------- | -------------------------------------------------------- |
-| `PUBLIC_HOST`        | _no default, value is required_ | Public server domain name                                |
-| `PUBLIC_PORT`        | `443`                           | Public server port                                       |
-| `CAS_HOST`           | _no default, value is required_ | Host of the SSO server                                   |
-| `CAS_PORT`           | `443`                           | Port of the SSO server                                   |
-| `CAS_SESSION_COOKIE` | `session`                       | The name of the cookie that will contain the JWT session |
-| `JWT_ISS`            | `sveltekit-cas`                 | The issuer of the JWT token                              |
-| `JWT_SECRET`         | `changeme`                      | The key used to generate the token signature             |
+- `casRoot`: The root URL to the CAS server
+- `casVersion`: The version of the CAS server (supported version: `1`, `2`, `3`)
+- `authRequired` _(optional)_: A function to indicate if a request should have an authenticated user
+- `rejectAccess` _(optional)_: A function to indicate if a particular authenticated user if allowed to do a request
 
 ## Contributing
 

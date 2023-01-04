@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1]
+
+### Fixed
+
+- Fix import failure with CommonJS
+
 ## [2.0.0]
 
 ### Changed
@@ -25,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First version
 
-[unreleased]: https://github.com/MacFJA/sveltekit-cas/compare/2.0.0...HEAD
+[unreleased]: https://github.com/MacFJA/sveltekit-cas/compare/2.0.1...HEAD
+[2.0.1]: https://github.com/MacFJA/sveltekit-cas/releases/tag/2.0.1
 [2.0.0]: https://github.com/MacFJA/sveltekit-cas/releases/tag/2.0.0
 [1.0.1]: https://github.com/MacFJA/sveltekit-cas/releases/tag/1.0.1
 [1.0.0]: https://github.com/MacFJA/sveltekit-cas/releases/tag/1.0.0

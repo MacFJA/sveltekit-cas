@@ -2,12 +2,12 @@
 	"name": "@macfja/sveltekit-cas",
 	"description": "CAS/SSO integration in SvelteKit",
 	"module": "dist/index.mjs",
-	"main": "dist/index.js",
-	"version": "2.0.0",
+	"main": "dist/index.cjs",
+	"version": "2.0.1",
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.js"
+			"require": "./dist/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -50,6 +50,7 @@
 		"vite": "^3.2.4 || ^4.0.0"
 	},
 	"peerDependencies": {
+		"@macfja/sveltekit-session": "^1.0.5",
 		"@sveltejs/kit": "^1.0.0-next.492"
 	},
 	"dependencies": {
